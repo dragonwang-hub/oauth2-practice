@@ -11,6 +11,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-                .oauth2Login(); // open oauth2 login method
+                .oauth2Login() // open oauth2 login method
+                .loginProcessingUrl("/authorization_code"); // custom login url
     }
 }
