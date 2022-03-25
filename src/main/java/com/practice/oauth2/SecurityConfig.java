@@ -18,6 +18,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login() // open oauth2 login method
+                .userInfoEndpoint()
+                .customUserType(GithubOAuthUser.class, "github") // custom user type
+                .and()
                 .loginProcessingUrl("/authorization_code"); // custom login url
     }
 
