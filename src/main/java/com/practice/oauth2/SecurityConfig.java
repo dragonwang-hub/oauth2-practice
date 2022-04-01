@@ -7,8 +7,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -18,10 +22,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login() // open oauth2 login method
-                .userInfoEndpoint()
-                .customUserType(GithubOAuthUser.class, "github") // custom user type
-                .and()
-                .loginProcessingUrl("/authorization_code"); // custom login url
+                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(this.oauthService()))
+                .loginProcessingUrl("/authorization_code");
+    }
+
+    private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauthService() {
+
+        final OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+
+        return userRequest -> (GithubOAuthUser) delegate.loadUser(userRequest);
     }
 
     @Bean
